@@ -1,0 +1,16 @@
+#game-container {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: repeat(3, 1fr);
+    height: 460px;
+    width: 500px;
+    margin: auto;
+}
+
+.cell {
+    background-color: black;
+    color: white;
+    font-size: xxx-large;
+    height: 150px;
+    padding: 0;
+}
