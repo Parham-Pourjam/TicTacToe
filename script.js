@@ -22,7 +22,7 @@ const gameBoard = (() => {
 
     let _player1; 
     let _player2; 
-    let currentPlayer;
+    let _currentPlayer;
 
     const setPlayers = (name) => {
         _player1 = Player(name, true, "X");
@@ -30,18 +30,37 @@ const gameBoard = (() => {
     }
 
     const changePlayer = () => {
-        if (currentPlayer == _player1) {
-            currentPlayer = _player2;
+        if (_currentPlayer == _player1) {
+            _currentPlayer = _player2;
         } else {
-            currentPlayer = _player1;
+            _currentPlayer = _player1;
         }
     };
 
-    const getCurrentPlayer = () => (currentPlayer);
+    const checkIfCellOccupied = (index) => {
+        let placedSymbol = _gameBoardArray[Math.floor(index / 3)][index % 3];
+
+        if (placedSymbol != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    const gameStart = () => {
+        let playerChoices = [0, 1];
+        let playerSelection = playerChoices[Math.floor(Math.random() * playerChoices.length)];
+        console.log(playerSelection);
+        changePlayer();
+    };
+
+    const getGameBoardArray = () => (_gameBoardArray);
+
+    const getCurrentPlayer = () => (_currentPlayer);
 
     setPlayers("Parham");
 
-    return {setPlayers, changePlayer, getCurrentPlayer}
+    return {setPlayers, changePlayer, getCurrentPlayer, getGameBoardArray, checkIfCellOccupied, gameStart}
 })();
 
 // Module pattern for display control
@@ -61,14 +80,38 @@ const displayController = (() => {
             
             gameContainer.appendChild(gridSquare);
         }
+        gameBoard.gameStart();
     };
 
     function addSymbol() {
-        gameBoard.changePlayer();
-        console.log(gameBoard.getCurrentPlayer().getName());
-        this.textContent = gameBoard.getCurrentPlayer().getSymbol();
+        //this.textContent = gameBoard.getCurrentPlayer().getSymbol();
         //gameBoard.changePlayer();
+        
+        if (updateGameBoardArray(this)) {
+            console.log(gameBoard.getCurrentPlayer().getName());
+            this.textContent = gameBoard.getCurrentPlayer().getSymbol();
+            gameBoard.changePlayer();
+            //console.log(gameBoard.getCurrentPlayer().getName());
+        }
+        console.log(gameBoard.getCurrentPlayer().getName());
     }
+
+    const updateGameBoardArray = (event) => {
+        // use regular expression to extract the "index" from the cells id
+        let index = event.id.match(/\d+/)[0];
+        let gameBoardRef = gameBoard.getGameBoardArray();
+        if (!gameBoard.checkIfCellOccupied(index)) {
+            gameBoardRef[Math.floor(index / 3)][index % 3] = gameBoard.getCurrentPlayer().getSymbol();
+            console.log(gameBoardRef);
+            return true;
+        } else {
+            console.log(gameBoardRef);
+            return false;
+        }
+        //let gameBoardRef = gameBoard.getGameBoardArray();
+        //gameBoardRef[Math.floor(index / 3)][index % 3] = gameBoard.getCurrentPlayer().getSymbol();
+        
+    };
     
     return{boardCreator}
 
