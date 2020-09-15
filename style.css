@@ -14,3 +14,23 @@
     height: 150px;
     padding: 0;
 }
+
+#player-form {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    height: 130px;
+    text-align: center;
+    margin-top: 20px;
+    border: solid;
+    padding-top: 15px;
+}
+
+#player1Name {
+    margin-bottom: 15px;
+}
+
+#submit-button {
+    margin-top: 20px;
+}
