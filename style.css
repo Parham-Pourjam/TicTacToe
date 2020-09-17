@@ -23,6 +23,7 @@
     height: 130px;
     text-align: center;
     margin-top: 20px;
+    margin-bottom: 20px;
     border: solid;
     padding-top: 15px;
 }
@@ -33,4 +34,14 @@
 
 #submit-button {
     margin-top: 20px;
+}
+
+#winner-display {
+    display: block;
+    border: solid;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    height: 100px;
 }

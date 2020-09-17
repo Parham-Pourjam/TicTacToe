@@ -24,9 +24,9 @@ const gameBoard = (() => {
     let _player2; 
     let _currentPlayer;
 
-    const setPlayers = (name) => {
-        _player1 = Player(name, true, "X");
-        _player2 = Player("Computer", false, "O");
+    const setPlayers = (name1, name2) => {
+        _player1 = Player(name1, true, "X");
+        _player2 = Player(name2, false, "O");
     }
 
     const changePlayer = () => {
@@ -59,10 +59,15 @@ const gameBoard = (() => {
     };
 
     const gameStart = () => {
-        let playerChoices = [0, 1];
-        let playerSelection = playerChoices[Math.floor(Math.random() * playerChoices.length)];
-        console.log(playerSelection);
+        //let playerChoices = [0, 1];
+        //let playerSelection = playerChoices[Math.floor(Math.random() * playerChoices.length)];
+        
+        let names = displayController.getPlayerNames();
+       
+        setPlayers(names[0], names[1]);
         changePlayer();
+        displayController.enableGameBoardInputs();
+        displayController.clearPlayerNames();
     };
 
     const checkForWin = (symbol) => {
@@ -144,7 +149,15 @@ const gameBoard = (() => {
 
     const getCurrentPlayer = () => (_currentPlayer);
 
-    setPlayers("Parham");
+    const formEventListener = () => {
+        const formComponent = document.querySelector('#submit-button');
+        formComponent.addEventListener('click', gameStart);
+    };
+
+    formEventListener();
+
+    
+    //setPlayers("Parham");
 
     return {clearGameBoardArray, checkForWin, checkForTie, setPlayers, changePlayer, getCurrentPlayer, getGameBoardArray, checkIfCellOccupied, gameStart}
 })();
@@ -162,11 +175,11 @@ const displayController = (() => {
             //gridSquare.textContent = "X";
             
             
-            gridSquare.addEventListener('click', addSymbol);
+            //gridSquare.addEventListener('click', addSymbol);
             
             gameContainer.appendChild(gridSquare);
         }
-        gameBoard.gameStart();
+        //gameBoard.gameStart();
     };
 
     // clear board after win or tie
@@ -191,15 +204,22 @@ const displayController = (() => {
             //console.log(gameBoard.getCurrentPlayer().getName());
         }
         if (gameBoard.checkForWin(symbol)) {
-            alert(player + " won");
+            //alert(player + " won");
+            updateWinnerDisplay(player + " won");
             gameBoard.clearGameBoardArray();
+            showForm();
         }
         else if (gameBoard.checkForTie() == 9) {
-            alert("TIed");
+            alert("Tied");
             gameBoard.clearGameBoardArray();
+            showForm();
         }
         console.log(gameBoard.getCurrentPlayer().getName());
     }
+
+    const updateWinnerDisplay = (result) => {
+        document.querySelector('#winner-display').textContent = result;
+    };
 
     const updateGameBoardArray = (event) => {
         // use regular expression to extract the "index" from the cells id
@@ -217,8 +237,44 @@ const displayController = (() => {
         //gameBoardRef[Math.floor(index / 3)][index % 3] = gameBoard.getCurrentPlayer().getSymbol();
         
     };
+
+    // Allow click event listener on game cells 
+    const enableGameBoardInputs = () => {
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', addSymbol);
+        });    
+    };
+
+    // Get player names from html form
+    const getPlayerNames = () => {
+        playerOneName = document.querySelector('#playerOneName').value;
+        playerTwoName = document.querySelector('#playerTwoName').value;
+
+        if (playerOneName == "") {
+            playerOneName = "No Name1";
+        } 
+        if (playerTwoName == "") {
+            playerTwoName = "No Name2";
+        }
+        hideForm();
+        return [playerOneName, playerTwoName];
+    };
+
+    // clear player names from html form
+    const clearPlayerNames = () => {
+        document.querySelector('#playerOneName').value = "";
+        document.querySelector('#playerTwoName').value = "";  
+    };
+
+    const hideForm = () => {
+        document.querySelector('#player-form').style.display = "none";
+    };
+
+    const showForm = () => {
+        document.querySelector('#player-form').style.display = "block";
+    };
     
-    return{boardCreator, refreshBoard}
+    return{boardCreator, refreshBoard, enableGameBoardInputs, getPlayerNames, clearPlayerNames}
 
 })();
 
