@@ -1,23 +1,14 @@
 // Factory function for player creation
-const Player = (name, isTurn, symbol) => {
+const Player = (name, symbol) => {
     const getName = () => name;
-    const getIsTurn = () => isTurn;
     const getSymbol = () => symbol;
 
-    const switchTurn = () => {
-        if (isTurn) {
-            isTurn = false;
-        } else {
-            isTurn = true;
-        }
-    };
-    
-    return {getName, getIsTurn, getSymbol, switchTurn}
+    return {getName, getSymbol}
 };
 
 // Module pattern for game logic
 const gameBoard = (() => {
-    // Use multi-dimesnional array to store state of gameboard (initially 0, dynamically changed to X or O)
+    // Use multi-dimensional array to store state of gameboard (initially 0, dynamically changed to X or O)
     let _gameBoardArray = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]; 
 
     let _player1; 
@@ -25,8 +16,8 @@ const gameBoard = (() => {
     let _currentPlayer;
 
     const setPlayers = (name1, name2) => {
-        _player1 = Player(name1, true, "X");
-        _player2 = Player(name2, false, "O");
+        _player1 = Player(name1, "X");
+        _player2 = Player(name2, "O");
     }
 
     const changePlayer = () => {
@@ -59,9 +50,6 @@ const gameBoard = (() => {
     };
 
     const gameStart = () => {
-        //let playerChoices = [0, 1];
-        //let playerSelection = playerChoices[Math.floor(Math.random() * playerChoices.length)];
-        
         let names = displayController.getPlayerNames();
        
         setPlayers(names[0], names[1]);
@@ -156,9 +144,6 @@ const gameBoard = (() => {
 
     formEventListener();
 
-    
-    //setPlayers("Parham");
-
     return {clearGameBoardArray, checkForWin, checkForTie, setPlayers, changePlayer, getCurrentPlayer, getGameBoardArray, checkIfCellOccupied, gameStart}
 })();
 
@@ -168,18 +153,12 @@ const displayController = (() => {
     
     const boardCreator = () => {
         for (let i = 0; i < 9; i++) {
-            //let gridSquare = document.createElement(`#grid-square-${i}`);
             let gridSquare = document.createElement("button");
             gridSquare.id = `cell-${i}`;
             gridSquare.classList.add("cell");
-            //gridSquare.textContent = "X";
-            
-            
-            //gridSquare.addEventListener('click', addSymbol);
             
             gameContainer.appendChild(gridSquare);
         }
-        //gameBoard.gameStart();
     };
 
     // clear board after win or tie
@@ -191,57 +170,66 @@ const displayController = (() => {
         });
     };
 
-    function addSymbol() {
-        //this.textContent = gameBoard.getCurrentPlayer().getSymbol();
-        //gameBoard.changePlayer();
+    function _addSymbol() {
         let symbol = gameBoard.getCurrentPlayer().getSymbol();
         let player = gameBoard.getCurrentPlayer().getName();
         
-        if (updateGameBoardArray(this)) {
+        if (_updateGameBoardArray(this)) {
             console.log(gameBoard.getCurrentPlayer().getName());
             this.textContent = gameBoard.getCurrentPlayer().getSymbol();
             gameBoard.changePlayer();
-            //console.log(gameBoard.getCurrentPlayer().getName());
         }
         if (gameBoard.checkForWin(symbol)) {
-            //alert(player + " won");
-            updateWinnerDisplay(player + " won");
+            _updateWinnerDisplay(_capitalizeFirstLetter(player) + " Wins!");
             gameBoard.clearGameBoardArray();
-            showForm();
+            _restartScreenVisible();
         }
         else if (gameBoard.checkForTie() == 9) {
-            alert("Tied");
+            _updateWinnerDisplay("Tie!");
             gameBoard.clearGameBoardArray();
-            showForm();
+            _restartScreenVisible();
         }
-        console.log(gameBoard.getCurrentPlayer().getName());
     }
 
-    const updateWinnerDisplay = (result) => {
-        document.querySelector('#winner-display').textContent = result;
+    const _capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
-    const updateGameBoardArray = (event) => {
+    const _restartScreenVisible = () => {
+        document.querySelector('#winning-message').style.display = "flex";
+        document.querySelector('#restartButton').addEventListener('click', _restartButton);
+    
+    };
+
+    function _restartButton() {
+        gameBoard.clearGameBoardArray();
+        _showForm();
+        document.querySelector('#winning-message').style.display = "none";
+    }
+
+    const _updateWinnerDisplay = (result) => {
+        document.querySelector('#win-text').textContent = result;
+    };
+
+    const _updateGameBoardArray = (event) => {
         // use regular expression to extract the "index" from the cells id
         let index = event.id.match(/\d+/)[0];
         let gameBoardRef = gameBoard.getGameBoardArray();
+        
+        // if cell isn't occupied then update gameBoardArray with players symbol
         if (!gameBoard.checkIfCellOccupied(index)) {
             gameBoardRef[Math.floor(index / 3)][index % 3] = gameBoard.getCurrentPlayer().getSymbol();
-            console.log(gameBoardRef);
             return true;
         } else {
             console.log(gameBoardRef);
             return false;
         }
-        //let gameBoardRef = gameBoard.getGameBoardArray();
-        //gameBoardRef[Math.floor(index / 3)][index % 3] = gameBoard.getCurrentPlayer().getSymbol();
-        
     };
 
     // Allow click event listener on game cells 
     const enableGameBoardInputs = () => {
         document.querySelectorAll('.cell').forEach(cell => {
-            cell.addEventListener('click', addSymbol);
+            cell.addEventListener('click', _addSymbol);
         });    
     };
 
@@ -251,12 +239,12 @@ const displayController = (() => {
         playerTwoName = document.querySelector('#playerTwoName').value;
 
         if (playerOneName == "") {
-            playerOneName = "No Name1";
+            playerOneName = "Player 1";
         } 
         if (playerTwoName == "") {
-            playerTwoName = "No Name2";
+            playerTwoName = "PLayer 2";
         }
-        hideForm();
+        _hideForm();
         return [playerOneName, playerTwoName];
     };
 
@@ -266,17 +254,16 @@ const displayController = (() => {
         document.querySelector('#playerTwoName').value = "";  
     };
 
-    const hideForm = () => {
+    const _hideForm = () => {
         document.querySelector('#player-form').style.display = "none";
     };
 
-    const showForm = () => {
+    const _showForm = () => {
         document.querySelector('#player-form').style.display = "block";
     };
     
     return{boardCreator, refreshBoard, enableGameBoardInputs, getPlayerNames, clearPlayerNames}
 
 })();
-
 
 displayController.boardCreator();

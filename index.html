@@ -7,15 +7,19 @@
     </head>
 
     <body>
+        <h1>Tic-Tac-Toe</h1>
+        <div id="game-container"></div>
         <form id="player-form">
             <label for="playerOneName">Player 1 Name &nbsp</label>
-            <input type="text" id="playerOneName" name="playerOneName"><br>
+            <input type="text" id="playerOneName" name="playerOneName" placeholder="Player 1"><br>
             <label for="playerTwoName">Player 2 Name &nbsp</label>
-            <input type="text" id="playerTwoName" name="playerTwoName"><br>
+            <input type="text" id="playerTwoName" name="playerTwoName" placeholder="Player 2"><br>
             <button type="button" id="submit-button">Start</button>
         </form>
-        <div id="game-container"></div>
-        <div id="winner-display"></div>
+        <div id="winning-message">
+            <div id="win-text">O's Win!</div>
+            <button id="restartButton">Restart</button>
+        </div>
     </body>
 
     <script src="script.js"></script>
